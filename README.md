@@ -1,15 +1,13 @@
-# TayeWalker-TimeSeriesPrediction
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multivariate MOIRAI</title>
+    <title>TayeWalker-TimeSeriesPrediction</title>
 </head>
 <body>
-    <h1>Multivariate_MOIRAI</h1>
-    <p>Uses the uni2ts Salesforce model to generate predictions.</p>
+    <h1>Multivariate MOIRAI</h1>
+    <p>This folder contains the code to run the uni2ts Salesforce model to generate predictions.</p>
     <h2>Dockerfile</h2>
     <p>Contains the code to run on a virtual Docker environment.</p>
     <ul>
@@ -20,7 +18,7 @@
         <li>Typical Run command: <code>docker run -v "$(pwd):/app" {insert image name}</code></li>
     </ul>
     <h2>script.py</h2>
-    <p>The Python code that executes when you run the image. It's currently full of comments, which helped me understand how the program worked.</p>
+    <p>This is the Python code that executes when you run the image. It's currently full of comments that helped me understand how the program works.</p>
     <h2>Other Folders</h2>
     <p>These include some plots that I've made of MOIRAI predictions with different choices of parameters. My default has been the parameters from their GitHub example:</p>
     <pre>
@@ -33,6 +31,6 @@ BSZ = 32
 samples = 100
     </pre>
     <h2>Data</h2>
-    <p>Contains real data, scripts, and synthetic data.</p>
+    <p>This folder contains the real data, scripts for generation, and synthetic data.</p>
 </body>
 </html>
