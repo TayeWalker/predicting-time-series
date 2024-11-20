@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TayeWalker-TimeSeriesPrediction</title>
 </head>
 <body>
-    <h1>Multivariate MOIRAI</h1>
+    <h2>Multivariate MOIRAI</h2>
     <p>This folder contains the code to run the uni2ts Salesforce model to generate predictions.</p>
     <h2>Dockerfile</h2>
     <p>Contains the code to run on a virtual Docker environment.</p>
