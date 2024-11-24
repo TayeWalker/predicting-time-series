@@ -1,0 +1,17 @@
+{
+    "folders": {
+        "multivariate": "Multivariate_MOIRAI",
+        "univariate": "Univariate_MOIRAI",
+        "evaluation": "comparison"
+    },
+    "docker_images": {
+        "multivariate": "multivariate_moirai_image",
+        "univariate": "univariate_moirai_image"
+    },
+    "parameters":{
+        "CTX": 200,
+        "PDT": 20,
+        "BSZ": 32,
+        "data_set": "input/unofficial_data.csv"
+    }
+}

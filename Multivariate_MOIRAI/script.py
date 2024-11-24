@@ -1,9 +1,11 @@
 import torch
+import numpy as np
 import matplotlib
 matplotlib.use('Agg') #agg is a backend for non-interactive enviroments
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from sklearn.metrics import mean_absolute_error
 
 from gluonts.evaluation.backtest import make_evaluation_predictions #function to generate forecasts
 from gluonts.dataset.field_names import FieldName #constants representing field names in data entries.
@@ -11,10 +13,12 @@ from gluonts.model.forecast import SampleForecast #forecast object containing sa
 
 from uni2ts.model.moirai import MoiraiForecast, MoiraiModule #model
 
+import json
 import os
 from datetime import datetime
 
-# Custom dataset class for handling the multivariate data. It seems clunky to use an iterator becuase we are only yielding one value, but I believe that's the expected form.
+# Custom dataset class for handling the multivariate data. 
+# It seems clunky to use an iterator becuase we are only yielding one value, but I believe that's the expected form.
 class CustomTimeSeriesDataset:
     '''Each entry contains a target and a start field. The start field '''
     def __init__(self, df, prediction_length, freq):
@@ -24,31 +28,31 @@ class CustomTimeSeriesDataset:
     
     def __iter__(self):
         yield {
-            FieldName.START: self.df.index[0],  # Gives the start date
+            FieldName.START: self.df.index[0],  # Gives the start date. There is no x variable we just have a start time and step forward by freq
             FieldName.TARGET: self.df.values.T,  # 2D shape: (variables, time steps). This field contains almost all the information
-            FieldName.ITEM_ID: "multivariate_series" #
+            FieldName.ITEM_ID: "multivariate_series" 
         }
     def __len__(self):
         return 1 #We are only yielding one value so this is true
 
-# I just put this here to make organization easier when I'm playing around with the code.
-# Creates a time stamped subfolder, which I place my predictions in later on
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-output_dir = f"PDT = 40, CTX = 180"
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+config_path = "config.json"
+with open(config_path, "r") as f:
+    config = json.load(f)
+parameters = config["parameters"]
+
 
 #Important Parameters
 device = 'cpu'
 SIZE = "large"
-PDT = 40  # Prediction length
-CTX = 180  # Context length
+CTX = parameters["CTX"] # Prediction length. Number of points we are going to predict.
+PDT = parameters["PDT"] # Context length. This is the length of the window from which we predict a single point.
+BSZ = parameters["BSZ"] # Batch size; smaller sizes improve computation time 
 PSZ = "auto"
-BSZ = 32 # batch size; smaller sizes improve computation time 
-samples = 100 #Times that we sample from the distribution
+data_set = parameters["data_set"]
+samples = 500 # Times that we sample from the distribution
 
 # Load Data
-df = pd.read_csv("unofficial_data.csv", parse_dates=['Date'])
+df = pd.read_csv(data_set, parse_dates=['Date'])
 df.set_index('Date', inplace=True)
 
 # Convert index to PeriodIndex with weekly frequency for compatibility with GluonTS
@@ -90,6 +94,18 @@ forecast_it, ts_it = make_evaluation_predictions(
 forecasts = list(forecast_it)
 tss = list(ts_it)
 
+# Save arrays to `.npy` files
+np.save('forecast', forecasts[0].quantile(0.5))
+np.save('truth', tss[0][CTX:])
+
+print("Arrays saved successfully!")
+
+
+# I just put this here to make organization easier when I'm playing around with the code.
+# Creates a time stamped subfolder, which I place my predictions in later on
+output_dir = f"Data:{data_set},PDT:{PDT}, CTX: {CTX}, and BSZ: {BSZ}"
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
 for idx, region in enumerate(df.columns):
 
@@ -114,7 +130,7 @@ for idx, region in enumerate(df.columns):
     
     # Plotting
     plt.figure(figsize=(10, 6))
-    past_data = ts[-CTX:]
+    past_data = ts[-CTX:] # this throws out initial data but I don't think we care 
     plt.plot(past_data.index.to_timestamp(), past_data.values, label='Past Data', color='b')
     plt.plot(forecast_dates, forecast_median, color='g', label='Forecast Median')
     plt.fill_between(
@@ -131,3 +147,115 @@ for idx, region in enumerate(df.columns):
     filename = f"Plot_{region}.png"
     plt.savefig(os.path.join(output_dir, filename))
     plt.close()
+
+
+#The MOIRAI paper uses this 
+def mase(y_true, y_pred, seasonal_period=1):
+    naive_forecast = y_true[:-seasonal_period]  # Naive forecast shifted by seasonal period
+    denominator = np.mean(np.abs(y_true[seasonal_period:] - naive_forecast))
+    numerator = np.mean(np.abs(y_true - y_pred))
+    return numerator / denominator
+def smape(y_true, y_pred):
+    numerator = np.abs(y_true - y_pred)
+    denominator = (np.abs(y_true) + np.abs(y_pred)) / 2
+    return np.mean(numerator / denominator) * 100
+def quantile_loss(y_true, y_pred, quantile):
+    residual = y_true - y_pred
+    return np.mean(np.maximum(quantile * residual, (quantile - 1) * residual))
+def coverage(y_true, lower_pred, upper_pred):
+    within_bounds = (y_true >= lower_pred) & (y_true <= upper_pred)
+    return np.mean(within_bounds) * 100
+
+
+# Initialize storage for results
+evaluation_results = []
+results_raw = []
+
+# Iterate over regions
+for idx, region in enumerate(df.columns):
+    print(f"Evaluating region: {region}")
+    
+    # Extract true and predicted values
+    y_true = tss[0][idx].iloc[-PDT:].values  # True values for the last PDT points
+    y_pred = forecasts[0].quantile(0.5)[:, idx]  # Median forecast
+    y_lower = forecasts[0].quantile(0.1)[:, idx]  # 10th percentile forecast
+    y_upper = forecasts[0].quantile(0.9)[:, idx]  # 90th percentile forecast
+
+    # Calculate metrics
+    mae = mean_absolute_error(y_true, y_pred)
+    mase_val = mase(y_true, y_pred, seasonal_period=1)  # Change seasonal_period if needed
+    smape_val = smape(y_true, y_pred)
+    ql = quantile_loss(y_true, y_pred, quantile=0.5)  # Evaluate quantile loss at 50% quantile
+    cov80 = coverage(y_true, y_lower, y_upper)  # Coverage for 80% PI
+    
+    # Store results
+    evaluation_results.append({
+        "Region": region,
+        "MAE": mae,
+        "MASE": mase_val,
+        "sMAPE": smape_val,
+        "QL_50%": ql,
+        "Coverage_80%": cov80
+    })
+
+# Convert to DataFrame for analysis
+evaluation_df = pd.DataFrame(evaluation_results)
+print(evaluation_df)
+
+
+# Define a helper function to save plots
+def save_plot(fig, filename, output_dir):
+    filepath = os.path.join(output_dir, filename)
+    fig.savefig(filepath)
+    plt.close(fig)
+
+# Plot MAE
+fig = plt.figure(figsize=(10, 6))
+plt.bar(evaluation_df["Region"], evaluation_df["MAE"], color='purple')
+plt.title("Mean Absolute Error (MAE) by Region")
+plt.xlabel("Region")
+plt.ylabel("MAE")
+plt.tight_layout()
+save_plot(fig, "MAE_by_Region.png", output_dir)
+
+# Plot MASE 
+'''fig = plt.figure(figsize=(10, 6))
+plt.bar(evaluation_df["Region"], evaluation_df["MASE"], color='blue')
+plt.title("Mean Absolute Scaled Error (MASE) by Region")
+plt.xlabel("Region")
+plt.ylabel("MASE")
+plt.axhline(1, color='red', linestyle='--', label="Naive Benchmark (MASE = 1)")
+plt.legend()
+plt.tight_layout()
+save_plot(fig, "MASE_by_Region.png", output_dir)'''
+
+# Plot sMAPE
+fig = plt.figure(figsize=(10, 6))
+plt.bar(evaluation_df["Region"], evaluation_df["sMAPE"], color='green')
+plt.title("Symmetric Mean Absolute Percentage Error (sMAPE) by Region")
+plt.xlabel("Region")
+plt.ylabel("sMAPE (%)")
+plt.tight_layout()
+save_plot(fig, "sMAPE_by_Region.png", output_dir)
+
+# Plot Coverage
+fig = plt.figure(figsize=(10, 6))
+plt.bar(evaluation_df["Region"], evaluation_df["Coverage_80%"], color='orange')
+plt.title("Coverage (80%) by Region")
+plt.xlabel("Region")
+plt.ylabel("Coverage (%)")
+plt.axhline(80, color='red', linestyle='--', label="Target Coverage (80%)")
+plt.legend()
+plt.tight_layout()
+save_plot(fig, "Coverage_by_Region.png", output_dir)
+
+# Plot Quantile Loss (QL)
+'''fig = plt.figure(figsize=(10, 6))
+plt.bar(evaluation_df["Region"], evaluation_df["QL_50%"], color='teal')
+plt.title("Quantile Loss (QL 50%) by Region")
+plt.xlabel("Region")
+plt.ylabel("QL (50%)")
+plt.tight_layout()
+save_plot(fig, "QL_50_by_Region.png", output_dir)'''
+
+print(f"Plots have been saved to: {output_dir}")

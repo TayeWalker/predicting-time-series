@@ -19,9 +19,8 @@
     <h2>script.py</h2>
     <p>This is the Python code that executes when you run the image. It's currently full of comments that helped me understand how the program works.</p>
     <h2>Other Folders</h2>
-    <p>These include some plots that I've made of MOIRAI predictions with different choices of parameters. My default has been the parameters from their GitHub example:</p>
+    <p>These include some plots that I've made of MOIRAI predictions with different choices of parameters. My default has been the parameters from the uni2ts GitHub zero shot example:</p>
     <pre>
-device = 'cpu'
 SIZE = "large"
 PDT = 200  
 CTX = 20  
@@ -30,6 +29,6 @@ BSZ = 32
 samples = 100
     </pre>
     <h2>Data</h2>
-    <p>This folder contains the real data, scripts for generation, and synthetic data.</p>
+    <p>This folder contains the scripts for generation and synthetic data. I have not included the real data.</p>
 </body>
 </html>

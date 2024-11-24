@@ -21,6 +21,7 @@ RUN pip install --no-cache-dir "jax[cpu]" -f https://storage.googleapis.com/jax-
 
 # Install PyTorch and torchvision
 RUN pip install --no-cache-dir torch torchvision torchaudio
+RUN pip install scikit-learn
 
 # Install general Python packages
 RUN pip install --no-cache-dir \
@@ -35,7 +36,7 @@ RUN pip install --no-cache-dir /app/MOIRAI
 
 # Copy your Python script and data into the container
 COPY script.py /app/script.py
-COPY unofficial_data.csv /app/unofficial_data.csv
+COPY input/unofficial_data.csv /app/unofficial_data.csv
 
 # Run the Python script when the container starts
 CMD ["python", "script.py"]
