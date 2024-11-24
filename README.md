@@ -3,23 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uni2TS Model Documentation</title>
 </head>
 <body>
-    <h2>Multivariate MOIRAI</h2>
-    <p>This folder contains the code to run the uni2ts Salesforce model to generate predictions.</p>
-    <h2>Dockerfile</h2>
-    <p>Contains the code to run on a virtual Docker environment.</p>
+    <h2>Purpose</h2>
+    <p>This repository contains code and results for using the Uni2TS Salesforce model to generate zero-shot predictions.</p>
+    <h2>Comparison</h2>
+    <p>
+        This folder compares multivariate and univariate predictions using <code>evaluate.py</code>. Bar graphs for sMAPE (Symmetric Mean Absolute Percentage Error) and MAE (Mean Absolute Error) are included. Datasets:
+    </p>
     <ul>
-        <li>The way I set it up requires you to clone the uni2ts repo onto your local machine: 
-            <a href="https://github.com/SalesforceAIResearch/uni2ts.git" target="_blank">https://github.com/SalesforceAIResearch/uni2ts.git</a>
-        </li>
-        <li>Typical Build command: <code>docker build -t {insert image name} .</code></li>
-        <li>Typical Run command: <code>docker run -v "$(pwd):/app" {insert image name}</code></li>
+        <li><strong>Default:</strong> 220 points ("unofficial_data" in the code).</li>
+        <li><strong>Large:</strong> 2,200 points.</li>
+        <li><strong>Suppressed:</strong> 2,200 points with noise suppression.</li>
     </ul>
-    <h2>script.py</h2>
-    <p>This is the Python code that executes when you run the image. It's currently full of comments that helped me understand how the program works.</p>
-    <h2>Other Folders</h2>
-    <p>These include some plots that I've made of MOIRAI predictions with different choices of parameters. My default has been the parameters from the uni2ts GitHub zero shot example:</p>
+    <h2>Multivariate_MOIRAI</h2>
+    <p>This folder contains the code and Dockerfile for running multivariate predictions on the datasets.</p>
+    <ul>
+        <li>Clone the Uni2TS repository: 
+            <a href="https://github.com/SalesforceAIResearch/uni2ts.git">https://github.com/SalesforceAIResearch/uni2ts.git</a>.
+        </li>
+        <li><strong>Build:</strong> <code>docker build -t {image name} .</code></li>
+        <li><strong>Run:</strong> <code>docker run -v "$(pwd):/app" {image name}</code></li>
+    </ul>
+    <h2>Multivariate_MOIRAI/Predictions</h2>
+    <p>
+        Multivariate predictions include plots and quantitative graphs for different parameters. Default parameters:
+    </p>
     <pre>
 SIZE = "large"
 PDT = 200  
@@ -28,7 +38,16 @@ PSZ = "auto"
 BSZ = 32 
 samples = 100
     </pre>
+    <h2>Univariate_MOIRAI</h2>
+    <p>This folder contains the univariate version of Multivariate_MOIRAI. The code and Docker configuration differ slightly.</p>
     <h2>Data</h2>
-    <p>This folder contains the scripts for generation and synthetic data. I have not included the real data.</p>
+    <p>
+        <code>generate.ipynb</code> creates synthetic data based on real initial data.
+        Thank you to Professor Takashi Okada for providing data on the COVID-19 allele frequencies.
+    </p>
+    <h2>Orchestrator.py and config.json</h2>
+    <p>
+        These files dynamically adjust parameters for predictions and pass results to <code>evaluate.py</code> for comparison.
+    </p>
 </body>
 </html>
