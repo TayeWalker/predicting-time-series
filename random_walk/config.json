@@ -1,0 +1,21 @@
+{
+    "folders": {
+        "univariate": "Univariate_MOIRAI"
+    },
+    "docker_images": {
+        "univariate": "univariate_moirai_image"
+    },
+    "runs": 
+    [ 
+        {
+            "CTX": 200,
+            "PDT": 1,
+            "BSZ": 32,
+            "PSZ": "auto",
+            "data_set": "random_walk.csv",
+            "NSP": 10000
+        }
+
+    ]
+        
+}
