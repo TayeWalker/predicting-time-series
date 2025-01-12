@@ -6,47 +6,46 @@
 </head>
 <body>
     <h2>Purpose</h2>
-    <p>This repository contains code and results for using the Uni2TS Salesforce model to generate zero-shot predictions.</p>
-    <h2>Comparison</h2>
+    <p>This repository contains code and results for using the Uni2TS Salesforce model to generate zero-shot predictions on allele frequency data.</p>
+    <h2>Random Walk</h2>
     <p>
-        This folder compares multivariate and univariate predictions using <code>evaluate.py</code>. Bar graphs for sMAPE (Symmetric Mean Absolute Percentage Error) and MAE (Mean Absolute Error) are included. Datasets:
+        This folder generates KL divergence and comparitive graphs between the univariate predictions and original distribution for a simulated random walk.
     </p>
-    <ul>
-        <li><strong>Default:</strong> 220 points ("unofficial_data" in the code).</li>
-        <li><strong>Large:</strong> 2,200 points.</li>
-        <li><strong>Suppressed:</strong> 2,200 points with noise suppression.</li>
-    </ul>
-    <h2>Multivariate_MOIRAI</h2>
-    <p>This folder contains the code and Dockerfile for running multivariate predictions on the datasets.</p>
-    <ul>
-        <li>Clone the Uni2TS repository: 
-            <a href="https://github.com/SalesforceAIResearch/uni2ts.git">https://github.com/SalesforceAIResearch/uni2ts.git</a>.
-        </li>
-        <li><strong>Build:</strong> <code>docker build -t {image name} .</code></li>
-        <li><strong>Run:</strong> <code>docker run -v "$(pwd):/app" {image name}</code></li>
-    </ul>
-    <h2>Multivariate_MOIRAI/Predictions</h2>
+    <h3>main.ipynb</h3>
     <p>
-        Multivariate predictions include plots and quantitative graphs for different parameters. Default parameters:
+        Interactive notebook that generates the random       walk and saves it as a CSV file in univrariate_MOIRAI. Next it builds and runs the dockerfile that calls model on the data. Output is saved to as a .npy. Finally we load the prediction and generate comparative graphs.
     </p>
-    <pre>
-SIZE = "large"
-PDT = 200  
-CTX = 20  
-PSZ = "auto"
-BSZ = 32 
-samples = 100
-    </pre>
-    <h2>Univariate_MOIRAI</h2>
-    <p>This folder contains the univariate version of Multivariate_MOIRAI. The code and Docker configuration differ slightly.</p>
-    <h2>Data</h2>
+    <h3>Univariate_MOIRAI</h3>
     <p>
-        <code>generate.ipynb</code> creates synthetic data based on real initial data.
+        This folder contains dockerfile and script for loading the model. Also stores most of the intermediate data (e.g. random walk and forecasts) so that they can be mounted during runtime.
+    </p>
+    <h3>Config Json</h3>
+    <p>
+        This file contains the parameters for running the model and selecting the dataset. It facilitates batched runs with different variables.
+    </p>
+    <h2>Three Deme</h2>
+    <p>
+        This folder is similar to random walk. Main differences are that we're now generating data for the model with multiple demes and so we need a multivariate model.
+    </p>
+    <h3>three_deme.ipynb</h3>
+    <p>
+        Same format as main.ipynb except now we have more complicated data simulation and visualization.
+    </p>
+    <h3>Multivariate_MOIRAI</h3>
+    <p>
+        Similar to univairate Moirai. I implemented the dockerfile differently because I wanted to speed up the build time. So in order to build the docker file, you must Clone the Uni2TS repository into Multivariate MOIRAI: <a href="https://github.com/SalesforceAIResearch/uni2ts.git">https://github.com/SalesforceAIResearch/uni2ts.git</a>.
+    </p>
+    <h3>figues</h3>
+    <p>
+        This folder stores graphs from previous runs.
+    </p>
+    <h2>old</h2>
+    <p>
+        Contains code for a previous approach. 
+    <h2><h2>
+    </p>
         Thank you to Professor Takashi Okada for providing data on the COVID-19 allele frequencies.
     </p>
-    <h2>Orchestrator.py and config.json</h2>
-    <p>
-        These files dynamically adjust parameters for predictions and pass results to <code>evaluate.py</code> for comparison.
-    </p>
+
 </body>
 </html>
