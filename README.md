@@ -9,11 +9,11 @@
     <p>This repository contains code and results for using the Uni2TS Salesforce model to generate zero-shot predictions on allele frequency data.</p>
     <h2>Random Walk</h2>
     <p>
-        This folder generates KL divergence and comparitive graphs between the univariate predictions and original distribution for a simulated random walk.
+        This folder generates KL divergence and comparative graphs between the univariate predictions and original distribution for a simulated random walk.
     </p>
     <h3>main.ipynb</h3>
     <p>
-        Interactive notebook that generates the random       walk and saves it as a CSV file in univrariate_MOIRAI. Next it builds and runs the dockerfile that calls model on the data. Output is saved to as a .npy. Finally we load the prediction and generate comparative graphs.
+        Interactive notebook that generates the random walk and saves it as a CSV file in Univrariate_MOIRAI. Next, it builds and runs the dockerfile that calls model on the data. Output is saved as a .npy. Finally, we load the prediction and generate comparative graphs.
     </p>
     <h3>Univariate_MOIRAI</h3>
     <p>
@@ -25,11 +25,11 @@
     </p>
     <h2>Three Deme</h2>
     <p>
-        This folder is similar to random walk. Main differences are that we're now generating data for the model with multiple demes and so we need a multivariate model.
+        This folder is similar to random_walk. The main difference is that we're now generating data for the model with multiple demes, so we need a multivariate model.
     </p>
     <h3>three_deme.ipynb</h3>
     <p>
-        Same format as main.ipynb except now we have more complicated data simulation and visualization.
+        Same format as main.ipynb, except now we have more complicated data simulation and visualization.
     </p>
     <h3>Multivariate_MOIRAI</h3>
     <p>
