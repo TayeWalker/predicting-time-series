@@ -33,7 +33,7 @@
     </p>
     <h3>Multivariate_MOIRAI</h3>
     <p>
-        Similar to univairate Moirai. I implemented the dockerfile differently because I wanted to speed up the build time. So in order to build the docker file, you must Clone the Uni2TS repository into Multivariate MOIRAI: <a href="https://github.com/SalesforceAIResearch/uni2ts.git">https://github.com/SalesforceAIResearch/uni2ts.git</a>. (See reference below)
+        Similar to univairate Moirai. I implemented the dockerfile differently because I wanted to speed up the build time. So in order to build the docker file, you must Clone the Uni2TS repository into Multivariate MOIRAI: <a href="https://github.com/SalesforceAIResearch/uni2ts.git">https://github.com/SalesforceAIResearch/uni2ts.git</a>. 
     </p>
     <h3>figues</h3>
     <p>
@@ -47,12 +47,9 @@
         Thank you to Professor Takashi Okada for providing data on the COVID-19 allele frequencies.
     </p>
     </h2>
-@article{aksu2024gifteval,
-  title={GIFT-Eval: A Benchmark For General Time Series Forecasting Model Evaluation},
-  author={Aksu, Taha and Woo, Gerald and Liu, Juncheng and Liu, Xu and Liu, Chenghao and Savarese, Silvio and Xiong, Caiming and Sahoo, Doyen},
-  journal={arXiv preprint arXiv:2410.10393},
-  year={2024}
-}
+Moirai Article:
+  Aksu et al. GIFT-Eval: A Benchmark For General Time Series Forecasting Model Evaluation. arXiv preprint arXiv:2410.10393.
+  2024.
 </p>
 
 </body>
